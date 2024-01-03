@@ -1,12 +1,15 @@
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
         Course pymc = new Course("PYMC", "Python Masterclass");
         Course jmc = new Course("JMC", "Java Masterclass");
+        Course jgames = new Course("JGMC", "Creating games in java");
 
         Student[] students= new Student[1000];
         Arrays.setAll(students, i-> Student.getRandomStudent(jmc, pymc));
@@ -58,5 +61,31 @@ public class Main {
                 .filter(s->s.getAge()-s.getAgeEnrolled() > 7 && s.getMonthsSinceActive()<12)
                 .count();
         System.out.println("Students who have been active more than 7 years: " + longTermStudents);
+
+
+        //PRACTICING REDUCE AND COLLECT IN STREAMS
+        List<Student> students1 = IntStream
+                .rangeClosed(1, 5000)
+                .mapToObj(s->Student.getRandomStudent(jmc, pymc))
+                .toList();
+
+        double totalPercent = students1.stream()
+                .mapToDouble(s->s.getPercentComplete("JMC"))
+                .reduce(0, Double::sum);
+
+        double avgPercent = totalPercent / students1.size();
+        System.out.printf("Average percent complete: %.2f%% %n", avgPercent);
+
+       int topPercent = (int)(1.25*avgPercent);
+       Comparator<Student> longTermStudent = Comparator.comparing(Student::getYearEnrolled);
+
+       List<Student> hardWorkers = students1.stream()
+               .filter(s->s.getMonthsSinceActive("JMC")==0)
+               .filter(s->s.getPercentComplete("JMC") >= topPercent)
+               .sorted(longTermStudent)
+               .limit(10)
+               .toList();
+       System.out.println("Students who 25 percent above than average = " + hardWorkers.size());
+
     }
 }
