@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Student {
     private static long lastStudentId = 1;
@@ -95,15 +96,22 @@ public class Student {
         }
     }
 
+    private static Course[] getRandomSelection(Course... courses){
+        int courseCount = random.nextInt(1, courses.length+1);
+        List<Course> randomCoursesList = new ArrayList<>(Arrays.asList(courses));
+        Collections.shuffle(randomCoursesList);
+        return randomCoursesList.subList(1,courseCount).toArray(new Course[0]);
+    }
     public static Student getRandomStudent(Course... courses){
         int maxYear = LocalDate.now().getYear() + 1;
+        Course[] randomCourses = getRandomSelection(courses);
         Student student = new Student(
                 getRandomVal("AU", "CA", "CN", "GB", "IN", "UA", "US"),
                 random.nextInt(2015, maxYear),
                 random.nextInt(18, 90),
                 getRandomVal("M", "F", "U"),
                 random.nextBoolean(),
-                courses);
+                randomCourses);
         for(Course c: courses){
             int lecture = random.nextInt(1, c.lectureCount());
             int year = random.nextInt(student.getYearEnrolled(), maxYear);
