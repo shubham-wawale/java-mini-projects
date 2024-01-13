@@ -17,6 +17,11 @@ public class Main {
         List<String> albums = dataSource.queryAlbumsForArtist("Iron Maiden", 1);
         albums.stream().forEach(System.out::println);
 
+        if(dataSource.createViewForSongArtists()){
+            System.out.println("View created");
+        };
+
+        dataSource.insertSong("Bird Dog", "Everly Brothers", "All-Time Greatest Hits", 7);
         dataSource.close();
     }
 }
